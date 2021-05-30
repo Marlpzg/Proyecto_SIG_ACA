@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Bumpify</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="loginurl">¿No posees una cuenta? Unete</string>
+    <string name="signinurl">¿Ya tienes una cuenta? Inicia sesión.</string>
+    <string name="género">Género:</string>
+    <string name="registrate">REGISTRATE</string>
+    <string name="inicia_sesion">INICIA SESIÓN</string>
 </resources>
