@@ -1,20 +1,18 @@
 package com.example.bumpify
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
-
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-
 import org.osmdroid.config.Configuration.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import java.util.*
 
-import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1;
@@ -36,9 +34,22 @@ class MainActivity : AppCompatActivity() {
 
         //inflate and create the map
         setContentView(R.layout.activity_main);
-
         map = findViewById<MapView>(R.id.map)
+        map.minZoomLevel = 9.0
+        map.maxZoomLevel = 20.0
         map.setTileSource(TileSourceFactory.MAPNIK);
+
+        var marker = Marker(map)
+        marker.position = GeoPoint(13.68018, -89.29228)
+        //marker.icon = ContextCompat.getDrawable(this, R.drawable.marker_icon)
+        marker.title = "Test Marker"
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        map.overlays.add(marker)
+
+        map.zoomToBoundingBox(marker.bounds, false)
+
+        map.invalidate()
+
     }
 
     override fun onResume() {
@@ -57,6 +68,18 @@ class MainActivity : AppCompatActivity() {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val north = 14.493502368787295
+        val east = -87.63762234512464
+        val south = 13.105392657621737
+        val west = -90.1565605733945
+
+        val boundingBox = BoundingBox(north, east, south, west)
+        //map.zoomToBoundingBox(boundingBox, false)
+        map.invalidate()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
