@@ -10,12 +10,12 @@ router.get('/test', function (req, res, next) {
 
     const collection = client.db(process.env.DATABASE_NAME_T).collection("shipwrecks");
 
-    collection.find().limit(10)
+    collection.find().project({"coordinates": 1})
       .toArray((err, result) => {
 
         if (err) res.json(err).status(500);
 
-        res.json(result).status(200);
+        res.json({points: JSON.stringify({"data":result})}).status(200);
         client.close();
 
       });
