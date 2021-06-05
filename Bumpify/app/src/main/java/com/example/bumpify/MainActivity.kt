@@ -5,6 +5,10 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
+import com.example.bumpify.repository.Repository
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import org.osmdroid.config.Configuration.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
@@ -15,8 +19,12 @@ import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private lateinit var map : MapView;
+    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+    private lateinit var map : MapView
+
+    private lateinit var viewModel: MainViewModel
+    data class Req(@SerializedName("data") val data: Array<Point>)
+    data class Point(@SerializedName("_id") val id: String, @SerializedName("coordinates") val coor: Array<Double>)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
 
@@ -35,18 +43,32 @@ class MainActivity : AppCompatActivity() {
         //inflate and create the map
         setContentView(R.layout.activity_main);
         map = findViewById<MapView>(R.id.map)
-        map.minZoomLevel = 9.0
-        map.maxZoomLevel = 20.0
+        //map.minZoomLevel = 9.0
+        //map.maxZoomLevel = 20.0
         map.setTileSource(TileSourceFactory.MAPNIK);
 
-        var marker = Marker(map)
-        marker.position = GeoPoint(13.68018, -89.29228)
-        //marker.icon = ContextCompat.getDrawable(this, R.drawable.marker_icon)
-        marker.title = "Test Marker"
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        map.overlays.add(marker)
+        val repository = Repository()
+        val viewModelFactory = MainViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        viewModel.getPost()
+        viewModel.myResponse.observe(this, { response ->
 
-        map.zoomToBoundingBox(marker.bounds, false)
+            val points: Req = Gson().fromJson(response.points, Req::class.java)
+
+            for (p in points.data) {
+                var marker = Marker(map)
+                Log.d("TEST",p.coor[1].toString())
+                marker.position = GeoPoint(p.coor[1], p.coor[0])
+                //marker.icon = ContextCompat.getDrawable(this, R.drawable.marker_icon)
+                marker.title = "Test Marker"
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                map.overlays.add(marker)
+
+            }
+        })
+
+
+        //map.zoomToBoundingBox(marker.bounds, false)
 
         map.invalidate()
 
