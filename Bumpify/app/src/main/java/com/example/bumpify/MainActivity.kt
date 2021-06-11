@@ -15,6 +15,8 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
 
@@ -43,9 +45,15 @@ class MainActivity : AppCompatActivity() {
         //inflate and create the map
         setContentView(R.layout.activity_main);
         map = findViewById<MapView>(R.id.map)
-        //map.minZoomLevel = 9.0
-        //map.maxZoomLevel = 20.0
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.minZoomLevel = 16.0
+        map.maxZoomLevel = 18.0
+        map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setMultiTouchControls(true)
+
+        val mLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(applicationContext), map)
+        mLocationOverlay.enableMyLocation()
+        mLocationOverlay.enableFollowLocation()
+        map.overlays.add(mLocationOverlay)
 
         val repository = Repository()
         val viewModelFactory = MainViewModelFactory(repository)
@@ -68,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        //map.zoomToBoundingBox(marker.bounds, false)
+        map.zoomToBoundingBox(mLocationOverlay.bounds, false)
 
         map.invalidate()
 
@@ -100,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         val west = -90.1565605733945
 
         val boundingBox = BoundingBox(north, east, south, west)
-        //map.zoomToBoundingBox(boundingBox, false)
+        map.zoomToBoundingBox(boundingBox, false)
         map.invalidate()
     }
 
