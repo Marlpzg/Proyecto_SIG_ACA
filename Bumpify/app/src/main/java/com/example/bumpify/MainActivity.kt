@@ -45,10 +45,15 @@ class MainActivity : AppCompatActivity() {
         //inflate and create the map
         setContentView(R.layout.activity_main);
         map = findViewById<MapView>(R.id.map)
-        map.minZoomLevel = 9.0
-        map.maxZoomLevel = 20.0
+        map.minZoomLevel = 16.0
+        map.maxZoomLevel = 18.0
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
+
+        val mLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(applicationContext), map)
+        mLocationOverlay.enableMyLocation()
+        mLocationOverlay.enableFollowLocation()
+        map.overlays.add(mLocationOverlay)
 
         val repository = Repository()
         val viewModelFactory = MainViewModelFactory(repository)
@@ -71,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        //map.zoomToBoundingBox(marker.bounds, false)
+        map.zoomToBoundingBox(mLocationOverlay.bounds, false)
 
         map.invalidate()
 
