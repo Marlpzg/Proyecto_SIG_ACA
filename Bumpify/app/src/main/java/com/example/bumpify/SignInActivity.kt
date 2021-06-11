@@ -65,7 +65,7 @@ class SignInActivity : AppCompatActivity() {
             Log.d("usuario", response.toString())
         })
     }
-    fun validartamanoinput(tamaniominimo: Number, cadena: String, tamaniomaximo: Number){
+    fun validartamanoinput(tamaniominimo: Int, cadena: String, tamaniomaximo: Int){
         if(cadena.length < tamaniominimo){
             Toast.makeText(this, "Su cadena debe ser mayor a "+tamaniominimo.toString(), Toast.LENGTH_LONG)
         }else if(cadena.length > tamaniomaximo){
