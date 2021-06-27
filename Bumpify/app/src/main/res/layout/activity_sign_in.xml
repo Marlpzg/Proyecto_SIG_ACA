@@ -131,7 +131,7 @@
             android:layout_height="wrap_content"
             android:text="Registrarse"
             android:background="@drawable/buttonborders"
-
+            android:onClick="enviarDatos"
             android:textColor="@color/white" ></Button>
         <TextView
             android:layout_width="wrap_content"
