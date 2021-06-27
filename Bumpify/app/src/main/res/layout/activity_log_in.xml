@@ -27,7 +27,7 @@
             android:textSize="20dp"
             android:layout_marginBottom="15dp"></TextView>
         <EditText
-            android:id="@+id/txtUsuario"
+            android:id="@+id/txtUsuario1"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:hint="Usuario"
@@ -39,7 +39,7 @@
             android:textColor="@color/white"
             android:backgroundTint="@color/white"></EditText>
         <EditText
-            android:id="@+id/txtContra"
+            android:id="@+id/txtContra1"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:hint="Contraseña"
@@ -56,6 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Iniciar sesión"
+            android:onClick="iniciarSesion"
             android:background="@drawable/buttonborders"
             android:textColor="@color/white" ></Button>
         <TextView
