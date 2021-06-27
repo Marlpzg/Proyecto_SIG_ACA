@@ -44,28 +44,56 @@ router.post('/add', function (req, res, next) {
       //collection.createIndex( { "username" : 1 }, { unique : true } );
       //collection.createIndex( { "email" : 1 }, { unique : true } );
       collection.insertOne(user).then(value => {
-        res.status(200).json({msg: "Usuario registrado exitosamente."});
-      }).catch(error =>{
-        if(error.keyValue.username){
-          res.status(500).json({msg: "El nombre de usuario ya existe."});
-        }else if(error.keyValue.email){
-          res.status(500).json({msg: "Esa dirección de correo ya ha sido utilizada."});
-        }else{
-          res.status(500).json({msg: "Ocurrió un error al ingresar el usuario."});
+        res.status(200).json({ msg: "Usuario registrado exitosamente." });
+      }).catch(error => {
+        if (error.keyValue.username) {
+          res.status(500).json({ msg: "El nombre de usuario ya existe." });
+        } else if (error.keyValue.email) {
+          res.status(500).json({ msg: "Esa dirección de correo ya ha sido utilizada." });
+        } else {
+          res.status(500).json({ msg: "Ocurrió un error al ingresar el usuario." });
         }
-        
+
       })
     }
   });
 });
 
-router.get('/search', function (req, res, next) {
 
-  var usuario = req.body.usuario;
-  var contra = req.body.password;
+router.get('/validate', function (req, res, next) {
 
+  var usuario = req.headers.usuario;
+  var contra = req.headers.password;
 
+  let client = db.client();
+  client.connect(err => {
+    if (err) {
+      res.json(err).status(500);
+    } else {
+      console.log(usuario.toString())
 
+      const collection = client.db(process.env.DATABASE_NAME).collection("users");
+      collection.find({ username: usuario }).project({ "_id": 0})
+      .toArray((err, result) => {
+
+        if (err) res.json(err).status(500);
+
+        //res.json({ "data": result }).status(200);
+        res.json({ user: JSON.stringify({ "data": result[0] }) }).status(200);
+        client.close();
+
+      });
+      /*
+      .then((value) => {
+        res.status(200).send(
+          { user: JSON.stringify(
+            {"data": JSON.stringify(value)}
+          )}
+        )
+            
+      })*/
+    }
+  })
 
 })
 
