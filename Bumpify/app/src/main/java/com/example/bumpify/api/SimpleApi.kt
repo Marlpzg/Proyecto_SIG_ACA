@@ -1,9 +1,6 @@
 package com.example.bumpify.api
 
-import com.example.bumpify.model.Post
-import com.example.bumpify.model.User
-import com.example.bumpify.model.UserReq
-import com.example.bumpify.model.UserSignIn
+import com.example.bumpify.model.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -27,4 +24,9 @@ interface SimpleApi {
 
     @GET("users/validate")
     suspend fun getUs(@Header("usuario") usuario: String, @Header("password") password: String): Response<UserReq>
+
+    @POST("/newEvent")
+    suspend fun pushReport(
+        @Body report: ReportModel
+    ): Response<ReportModel>
 }
