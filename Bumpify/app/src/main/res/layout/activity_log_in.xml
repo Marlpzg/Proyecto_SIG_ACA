@@ -5,8 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LogInActivity"
+    android:id="@+id/logincontainer"
     >
     <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -63,6 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/loginurl"
+            android:onClick="abrirSignIn"
             android:layout_marginTop="15dp"
             android:textColor="@color/orange"
             android:textFontWeight="10"

@@ -21,8 +21,8 @@ class Repository {
     suspend fun getUser(userSignIn: UserSignIn): Response<UserSignIn> {
         return RetrofitInstance.api.getUser(userSignIn);
     }
-    suspend fun getUs(usuario: String): UserReq{
-        return RetrofitInstance.api.getUs(usuario)
+    suspend fun getUs(usuario: String, password: String): Response<UserReq>{
+        return RetrofitInstance.api.getUs(usuario, password)
     }
 
 }

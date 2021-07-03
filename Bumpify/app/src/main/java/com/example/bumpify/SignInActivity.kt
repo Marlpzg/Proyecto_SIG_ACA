@@ -1,5 +1,6 @@
 package com.example.bumpify
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
@@ -15,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.bumpify.model.Post
 import com.example.bumpify.model.User
 import com.example.bumpify.repository.Repository
+import com.scottyab.aescrypt.AESCrypt
 import java.time.Duration
 import java.util.Base64.getEncoder
 import javax.crypto.Cipher
@@ -59,7 +61,7 @@ class SignInActivity : AppCompatActivity() {
         val repository = Repository()
         val viewModelFactory = MainViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-        val myPost = User(nombre, apellido, correo, usuario, encrypt(contra, "1234567812345678"), genero)
+        val myPost = User(nombre, apellido, correo, usuario, AESCrypt.encrypt(contra, "hello world"), genero)
         viewModel.pushUser(myPost)
         viewModel.myResponse.observe(this, Observer { response ->
             Log.d("usuario", response.toString())
@@ -82,6 +84,11 @@ class SignInActivity : AppCompatActivity() {
         //3. Encryption and decryption
         val encrypt = cipher.doFinal(input.toByteArray());
         return Base64.encode(encrypt, DEFAULT).toString()
+    }
+
+    fun abrirLogIn(v: View){
+        val intent = Intent(this, LogInActivity::class.java)
+        startActivity(intent)
     }
 
 }

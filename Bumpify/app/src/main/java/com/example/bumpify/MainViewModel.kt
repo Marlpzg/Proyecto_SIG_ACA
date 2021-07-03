@@ -1,5 +1,6 @@
 package com.example.bumpify
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +17,7 @@ class MainViewModel( private val repository: Repository): ViewModel() {
     val myResponse: MutableLiveData<Post> = MutableLiveData()
     val myUser: MutableLiveData<Response<User>> = MutableLiveData()
     val getUs: MutableLiveData<Response<UserSignIn>> = MutableLiveData()
-    val getUsu: MutableLiveData<UserReq> = MutableLiveData()
+    val getUsu: MutableLiveData<Response<UserReq>> = MutableLiveData()
 
     fun getPost(location:String){
         viewModelScope.launch {
@@ -35,14 +36,18 @@ class MainViewModel( private val repository: Repository): ViewModel() {
     fun getUser(userSignIn: UserSignIn){
         viewModelScope.launch {
             val response = repository.getUser(userSignIn)
+
+
             getUs.value = response
         }
     }
 
-    fun getUsu(usuario: String){
+    fun getUsu(usuario: String, password: String){
         viewModelScope.launch{
-            val response = repository.getUs(usuario)
+            val response = repository.getUs(usuario, password)
             getUsu.value = response
+
+
         }
     }
 

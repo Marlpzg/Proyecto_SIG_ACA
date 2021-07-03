@@ -26,5 +26,5 @@ interface SimpleApi {
     ): Response<UserSignIn>
 
     @GET("users/validate")
-    suspend fun getUs(@Header("usuario") usuario: String): UserReq
+    suspend fun getUs(@Header("usuario") usuario: String, @Header("password") password: String): Response<UserReq>
 }
