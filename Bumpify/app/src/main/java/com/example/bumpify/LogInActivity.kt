@@ -1,28 +1,26 @@
 package com.example.bumpify
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.telephony.gsm.GsmCellLocation
-import android.util.Base64
+import android.telecom.Call
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.bumpify.model.User
 import com.example.bumpify.model.UserModel
 import com.example.bumpify.model.UserReq
-import com.example.bumpify.model.UserSignIn
 import com.example.bumpify.repository.Repository
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.scottyab.aescrypt.AESCrypt
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
+import java.net.SocketTimeoutException
+
 
 class LogInActivity : AppCompatActivity() {
     lateinit var usuario : EditText
@@ -41,33 +39,42 @@ class LogInActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
+        super.onStart()
         repository  = Repository()
         viewModelFactory = MainViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-        viewModel.getUsu.observe(this, Observer { response ->
-            val res: Req = Gson().fromJson(response.body()?.user, Req::class.java)
+        try {
+            viewModel.getUsu.observe(this, Observer { response ->
+                val res: Req = Gson().fromJson(response.body()?.user, Req::class.java)
 
-            if(res.user.email == "-" && res.user.gender == "-"){
-                val contexto = findViewById<View>(R.id.logincontainer)
-                val snack = Snackbar.make(contexto,"Usuario o contraseña incorrectos", Snackbar.LENGTH_INDEFINITE);
-                snack.setAction("Aceptar",View.OnClickListener { btnIniciar.isEnabled = true })
-                snack.show()
+                if(res.user.email == "-" && res.user.gender == "-"){
+                    val contexto = findViewById<View>(R.id.logincontainer)
+                    val snack = Snackbar.make(contexto,"Usuario o contraseña incorrectos", Snackbar.LENGTH_INDEFINITE);
+                    snack.setAction("Aceptar",View.OnClickListener { btnIniciar.isEnabled = true })
+                    snack.show()
 
-            }else if (res.user.email == "$" && res.user.gender == "$"){
+                }else if (res.user.email == "$" && res.user.gender == "$"){
 
-                val contexto = findViewById<View>(R.id.logincontainer)
-                val snack = Snackbar.make(contexto,"Ocurrió un error inesperado", Snackbar.LENGTH_INDEFINITE);
-                snack.setAction("Aceptar",View.OnClickListener { btnIniciar.isEnabled = true })
-                snack.show()
+                    val contexto = findViewById<View>(R.id.logincontainer)
+                    val snack = Snackbar.make(contexto,"Ocurrió un error inesperado", Snackbar.LENGTH_INDEFINITE);
+                    snack.setAction("Aceptar",View.OnClickListener { btnIniciar.isEnabled = true })
+                    snack.show()
 
-            }else{
-                btnIniciar.isEnabled = true
-                val intent = Intent(this,MainActivity::class.java)
-                startActivity(intent)
-            }
+                }else{
+                    writeToFile("true")
+                    btnIniciar.isEnabled = true
+                    val intent = Intent(this,MainActivity::class.java)
+                    startActivity(intent)
+                }
 
-        })
-        super.onStart()
+            })
+        }catch (ex: IOException){
+            val contexto = findViewById<View>(R.id.logincontainer)
+            val snack = Snackbar.make(contexto,"Sin conexión a internet", Snackbar.LENGTH_INDEFINITE);
+            snack.setAction("Aceptar",View.OnClickListener { btnIniciar.isEnabled = true })
+            snack.show()
+        }
+
     }
 
 
@@ -81,11 +88,46 @@ class LogInActivity : AppCompatActivity() {
         //val getUser = UserSignIn(usertext, encrypt(contratext, "1234567812345678"))
         viewModel.getUsu(usertext, AESCrypt.encrypt(contratext, "hello world"))
 
+
+    }
+
+    fun onFailure(error: Throwable) {
+        if (error is SocketTimeoutException) {
+            // "Connection Timeout";
+        } else if (error is IOException) {
+            // "Timeout";
+        } else {
+
+        }
     }
 
     fun abrirSignIn(v: View){
         val intent = Intent(this, SignInActivity::class.java)
         startActivity(intent)
     }
+
+    //Función para escribir a un archivo
+    fun writeToFile(str: String) {
+        val dir = File(filesDir, "mydir")
+
+        if (!dir.exists()) {
+            dir.mkdir()
+        }
+
+        try {
+            Log.d("TAG", dir.toString())
+            val gpxfileold = File(dir, "sesion.txt")
+            gpxfileold.delete()
+            val gpxfile = File(dir, "sesion.txt")
+            val writer = FileWriter(gpxfile)
+            writer.append(str)
+            writer.flush()
+            writer.close()
+            Log.d("TAG", "Se guardó correctamente")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
 }
