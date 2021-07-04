@@ -59,18 +59,119 @@ router.get('/surroundings', function (req, res, next) {
       res.json(err).status(500);
     } else {
       const collection = client.db(process.env.DATABASE_NAME).collection("events");
-      //collection.createIndex( { "coords" : "2dsphere" } );
-      
-      collection.find({ coords: { $geoWithin: { $centerSphere: [ [ lon, lat ], converter.km2rad(5) ] } } }).limit(10).project({ "_id": 0, "coords": 1, "type": 1 })
+
+      collection.find({ coords: { $geoWithin: { $centerSphere: [[lon, lat], converter.km2rad(5)] } } }).project({ "_id": 0, "coords": 1, "type": 1 })
         .toArray((err, result) => {
 
-          if (err) res.json(err).status(500);
+          if (err) res.json(err).status(500)
+          else {
 
-          //res.json({ "data": result }).status(200);
-          res.json({ points: JSON.stringify({ "data": result }) }).status(200);
-          client.close();
+            let points = result;
+
+            let filter = {
+              $and: [
+                {
+                  coords: {
+                    $geoWithin: {
+                      $centerSphere: [
+                        [lon, lat],
+                        converter.km2rad(0.5)
+                      ]
+                    }
+                  }
+                },
+                {
+                  $or: [
+                    { type: 1 },
+                    { type: 4 }
+                  ]
+                }
+              ]
+            }
+            collection.find(filter).project({ "_id": 0 })
+              .toArray((err, result) => {
+
+                if (err) res.json(err).status(500)
+                else {
+                  dangerPoints = 0;
+                  result.forEach(p => {
+                    dangerPoints++;
+                    p.votes.forEach(v => {
+                      dangerPoints += v[1];
+                    })
+                  })
+
+                  res.json({ points: JSON.stringify({ "data": points })/*, dangerLevel: dangerPoints */}).status(200);
+                  client.close();
+
+                }
+
+              });
+
+          }
 
         });
+    }
+  });
+
+});
+
+router.post('/newEvent', function (req, res, next) {
+
+  let client = db.client();
+
+  client.connect(err => {
+    if (err) {
+      res.json(err).status(500);
+    } else {
+
+      let lon = req.body.lon;
+      let lat =  req.body.lat;
+
+      let event = {
+        date: new Date(),
+        type: req.body.type,
+        desc: req.body.desc,
+        coords: [lon, lat],
+        votes: []
+      }
+
+      const collection = client.db(process.env.DATABASE_NAME).collection("events");
+      let filter = {
+        $and: [
+          {
+            coords: {
+              $geoWithin: {
+                $centerSphere: [
+                  [lon, lat],
+                  converter.km2rad(0.05)
+                ]
+              }
+            }
+          },
+          {
+            type: req.body.type        
+          }
+        ]
+      }
+      console.log(event);
+      
+      collection.find(filter).project({ "_id": 0 })
+        .toArray((err, result) => {
+
+          if (err) res.json(err).status(500)
+          else {
+
+            console.log(result);
+            //res.json({ response: "text" }).status(200);
+            res.json({ points: JSON.stringify({ "data": result })}).status(200);
+            client.close();
+
+          }
+
+        });
+
+      
     }
   });
 

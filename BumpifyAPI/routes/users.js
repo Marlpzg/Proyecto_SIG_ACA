@@ -63,24 +63,45 @@ router.post('/add', function (req, res, next) {
 router.get('/validate', function (req, res, next) {
 
   var usuario = req.headers.usuario;
-  var contra = req.headers.password;
+  var password = req.headers.password;
 
   let client = db.client();
   client.connect(err => {
     if (err) {
       res.json(err).status(500);
     } else {
-      console.log(usuario.toString())
-
       const collection = client.db(process.env.DATABASE_NAME).collection("users");
-      collection.find({ username: usuario }).project({ "_id": 0})
+      collection.find({ username: usuario, passwd: password }).project({ "_id": 0})
       .toArray((err, result) => {
 
-        if (err) res.json(err).status(500);
+        if (err) res.json({ user: JSON.stringify({
+          "data": {
+            name:"$",
+            lastName:"$",
+            email:"$",
+            username:"$",
+            passwd:"$",
+            gender:"$"
+          } 
+        }) }).status(500);
 
-        //res.json({ "data": result }).status(200);
-        res.json({ user: JSON.stringify({ "data": result[0] }) }).status(200);
-        client.close();
+        if (result.length == 0){
+          res.json({ user: JSON.stringify({
+            "data": {
+              name:"-",
+              lastName:"-",
+              email:"-",
+              username:"-",
+              passwd:"-",
+              gender:"-"
+            } 
+          }) }).status(401)
+        } else {
+          console.log(result[0]);
+          res.json({ user: JSON.stringify({ "data": result[0] }) }).status(200);
+          client.close();
+        }
+
 
       });
       /*

@@ -10,8 +10,10 @@ const user = {
 
 const event = {
     _id: "",
+    date: date,
     type: "",
     desc: "",
-    coords: [lat, lon], 
-    votes: [{user_id,score}] //Like +1, Dislike -1
+    coords: [lon, lat],
+    votes: [{ user_id, score }] //Like +1, Dislike -1
 }
+
