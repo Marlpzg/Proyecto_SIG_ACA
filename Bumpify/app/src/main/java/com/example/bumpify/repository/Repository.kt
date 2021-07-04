@@ -1,10 +1,7 @@
 package com.example.bumpify.repository
 
 import com.example.bumpify.api.RetrofitInstance
-import com.example.bumpify.model.Post
-import com.example.bumpify.model.User
-import com.example.bumpify.model.UserReq
-import com.example.bumpify.model.UserSignIn
+import com.example.bumpify.model.*
 import retrofit2.Response
 
 class Repository {
@@ -23,6 +20,9 @@ class Repository {
     }
     suspend fun getUs(usuario: String, password: String): Response<UserReq>{
         return RetrofitInstance.api.getUs(usuario, password)
+    }
+    suspend fun pushReport(report: ReportModel): Response<ReportModel>{
+        return RetrofitInstance.api.pushReport(report)
     }
 
 }

@@ -16,12 +16,20 @@
         android:theme="@style/Theme.Bumpify"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
-        <activity android:name=".OptionsActivity"></activity>
-        <activity android:name=".ReportActivity" />
-        <activity
-            android:name=".MainActivity2"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/Theme.Bumpify.NoActionBar" />
+        <activity android:name=".OptionsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ReportActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".WaitingScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
