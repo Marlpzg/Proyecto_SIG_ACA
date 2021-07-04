@@ -25,4 +25,6 @@ class Repository {
         return RetrofitInstance.api.getUs(usuario, password)
     }
 
+
+
 }

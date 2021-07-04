@@ -40,11 +40,17 @@ class LogInActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
         repository  = Repository()
+
         viewModelFactory = MainViewModelFactory(repository)
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
         try {
             viewModel.getUsu.observe(this, Observer { response ->
+
+
                 val res: Req = Gson().fromJson(response.body()?.user, Req::class.java)
 
                 if(res.user.email == "-" && res.user.gender == "-"){
@@ -86,20 +92,21 @@ class LogInActivity : AppCompatActivity() {
         btnIniciar.isEnabled = false
         AESCrypt.encrypt(contratext, "hello world")
         //val getUser = UserSignIn(usertext, encrypt(contratext, "1234567812345678"))
-        viewModel.getUsu(usertext, AESCrypt.encrypt(contratext, "hello world"))
+        try {
 
-
-    }
-
-    fun onFailure(error: Throwable) {
-        if (error is SocketTimeoutException) {
-            // "Connection Timeout";
-        } else if (error is IOException) {
-            // "Timeout";
-        } else {
-
+            viewModel.getUsu(usertext, AESCrypt.encrypt(contratext, "hello world"))
+        }catch (e: IOException){
+            val contexto = findViewById<View>(R.id.logincontainer)
+            val snack = Snackbar.make(contexto,"Sin conexión a internet", Snackbar.LENGTH_INDEFINITE);
+            snack.setAction("Aceptar",View.OnClickListener { btnIniciar.isEnabled = true })
+            snack.show()
         }
+
+
+
     }
+
+
 
     fun abrirSignIn(v: View){
         val intent = Intent(this, SignInActivity::class.java)
