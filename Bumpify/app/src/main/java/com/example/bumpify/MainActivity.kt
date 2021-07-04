@@ -18,13 +18,18 @@ Licensed to the Apache Software Foundation (ASF) under one
  */
 package com.example.bumpify
 
+import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.bumpify.repository.Repository
 import com.google.gson.Gson
@@ -39,13 +44,13 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.io.IOException
-import java.net.SocketTimeoutException
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+    private val COARSE_LOCATION_PERMISSIONS_CODE = 2
+    private val FINE_LOCATION_PERMISSIONS_CODE = 3
     private lateinit var map : MapView
     private lateinit var mLocationOverlay: MyLocationNewOverlay
     private lateinit var runnable: Runnable
@@ -58,6 +63,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         //handle permissions first, before map is created. not depicted here
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "You have already granted this permission!",
+                Toast.LENGTH_SHORT).show();
+        } else {
+            requestLocationPermission();
+        }
 
         //load/initialize the osmdroid configuration, this can be done
         // This won't work unless you have imported this: org.osmdroid.config.Configuration.*
@@ -87,6 +99,44 @@ class MainActivity : AppCompatActivity() {
 
         map.invalidate()
 
+    }
+
+    private fun requestLocationPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permisos de ubicación necesario")
+                .setMessage("Usaremos tu ubicación para poder ubicar correctamente los incidentes que reportes")
+                .setPositiveButton("ok",
+                    DialogInterface.OnClickListener { dialog, which ->
+                        ActivityCompat.requestPermissions(
+                            this@MainActivity, arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            ), FINE_LOCATION_PERMISSIONS_CODE
+                        )
+                    })
+                .setNegativeButton("cancel",
+                    DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
+                .create().show()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                FINE_LOCATION_PERMISSIONS_CODE
+            )
+        }
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+        if (requestCode == FINE_LOCATION_PERMISSIONS_CODE) {
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     fun quemar() = runBlocking { // this: CoroutineScope
@@ -157,12 +207,13 @@ class MainActivity : AppCompatActivity() {
 
         locationbtn.setOnClickListener {
             mLocationOverlay.enableFollowLocation()
+            requestLocationPermission()
         }
 
         map.invalidate()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    /*override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         val permissionsToRequest = ArrayList<String>()
         var i = 0
         while (i < grantResults.size) {
@@ -175,7 +226,8 @@ class MainActivity : AppCompatActivity() {
                 permissionsToRequest.toTypedArray(),
                 REQUEST_PERMISSIONS_REQUEST_CODE)
         }
-    }
+    }*/
+
     fun abrirReporte(v: View){
         val intent = Intent(this, OptionsActivity::class.java)
         intent.putExtra("latitude", mLocationOverlay.myLocation.latitude)
