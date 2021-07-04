@@ -18,6 +18,7 @@ Licensed to the Apache Software Foundation (ASF) under one
  */
 package com.example.bumpify
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
@@ -174,6 +175,12 @@ class MainActivity : AppCompatActivity() {
                 permissionsToRequest.toTypedArray(),
                 REQUEST_PERMISSIONS_REQUEST_CODE)
         }
+    }
+    fun abrirReporte(v: View){
+        val intent = Intent(this, OptionsActivity::class.java)
+        intent.putExtra("latitude", mLocationOverlay.myLocation.latitude)
+        intent.putExtra("longitude", mLocationOverlay.myLocation.longitude)
+        startActivity(intent)
     }
 
 

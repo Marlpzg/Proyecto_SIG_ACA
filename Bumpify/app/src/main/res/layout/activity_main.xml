@@ -30,6 +30,7 @@
         android:backgroundTint="@color/backgroundorange"
         app:fabCustomSize="70dp"
         app:maxImageSize="45dp"
+        android:onClick="abrirReporte"
         app:srcCompat="@drawable/ic_baseline_campaign_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/mylocation"

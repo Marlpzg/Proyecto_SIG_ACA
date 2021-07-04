@@ -4,10 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bumpify.model.Post
-import com.example.bumpify.model.User
-import com.example.bumpify.model.UserReq
-import com.example.bumpify.model.UserSignIn
+import com.example.bumpify.model.*
 import com.example.bumpify.repository.Repository
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -16,6 +13,7 @@ class MainViewModel( private val repository: Repository): ViewModel() {
 
     val myResponse: MutableLiveData<Post> = MutableLiveData()
     val myUser: MutableLiveData<Response<User>> = MutableLiveData()
+    val myReport: MutableLiveData<Response<ReportModel>> = MutableLiveData()
     val getUs: MutableLiveData<Response<UserSignIn>> = MutableLiveData()
     val getUsu: MutableLiveData<Response<UserReq>> = MutableLiveData()
 
@@ -48,6 +46,13 @@ class MainViewModel( private val repository: Repository): ViewModel() {
             getUsu.value = response
 
 
+        }
+    }
+
+    fun pushReport(report: ReportModel){
+        viewModelScope.launch {
+            val response = repository.pushReport(report)
+            myReport.value = response
         }
     }
 
