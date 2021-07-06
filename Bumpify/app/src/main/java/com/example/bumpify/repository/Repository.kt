@@ -11,14 +11,14 @@ class Repository {
     }
 
 
-    suspend fun pushUser(user: User): Response<User> {
+    suspend fun pushUser(user: User): Response<Respuesta>{
         return RetrofitInstance.api.pushUser(user);
     }
 
     suspend fun getUser(userSignIn: UserSignIn): Response<UserSignIn> {
         return RetrofitInstance.api.getUser(userSignIn);
     }
-    suspend fun getUs(usuario: String, password: String): Response<UserReq>{
+        suspend fun getUs(usuario: String, password: String): Response<UserReq>{
         return RetrofitInstance.api.getUs(usuario, password)
     }
     suspend fun pushReport(report: ReportModel): Response<ReportModel>{

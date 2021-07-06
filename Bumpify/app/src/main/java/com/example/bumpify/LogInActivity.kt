@@ -30,12 +30,24 @@ class LogInActivity : AppCompatActivity() {
     private lateinit var viewModelFactory: MainViewModelFactory
     private lateinit var btnIniciar: View
 
+
     data class Req(@SerializedName("data") val user: UserModel)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
         usuario = findViewById<EditText>(R.id.txtUsuario1)
         contra = findViewById<EditText>(R.id.txtContra1)
+
+        var intent = intent
+        if(intent.hasExtra("mensaje")){
+            var mensaje = intent.getStringExtra("mensaje")
+            val contexto = findViewById<View>(R.id.logincontainer)
+            val snack = Snackbar.make(contexto, mensaje.toString(), Snackbar.LENGTH_INDEFINITE);
+            snack.setAction("Aceptar", View.OnClickListener { snack.dismiss() })
+            snack.show()
+        }
+
+
     }
 
     override fun onStart() {
