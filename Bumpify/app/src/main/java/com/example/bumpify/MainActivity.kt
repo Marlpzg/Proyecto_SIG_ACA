@@ -19,6 +19,7 @@ Licensed to the Apache Software Foundation (ASF) under one
 package com.example.bumpify
 
 import android.Manifest
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -26,7 +27,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -167,24 +167,33 @@ class MainActivity : AppCompatActivity() {
 
             val points: Req = Gson().fromJson(response.points, Req::class.java)
             val textView: TextView = findViewById(R.id.tv_danger)
+
+            val view: View = this.findViewById<View>(android.R.id.content).rootView
+
             if(points.danger <= 2.00){
                 textView.text = "SEGURO"
                 textView.setTextColor(Color.parseColor("#0068c9"))
+                view.setBackgroundColor(Color.parseColor("#0068c9"))
             }else if(points.danger > 2.00 && points.danger <= 5.00){
                 textView.text = "MAYORMENTE SEGURO"
                 textView.setTextColor(Color.parseColor("#00a336"))
+                view.setBackgroundColor(Color.parseColor("#00a336"))
             }else if(points.danger > 5.00 && points.danger <= 8.00){
                 textView.text = "MODERADO"
                 textView.setTextColor(Color.parseColor("#e6da00"))
+                view.setBackgroundColor(Color.parseColor("#e6da00"))
             }else if(points.danger > 8.00 && points.danger <= 11.00){
                 textView.text = "POCO SEGURO"
                 textView.setTextColor(Color.parseColor("#e06c00"))
+                view.setBackgroundColor(Color.parseColor("#e06c00"))
             }else if(points.danger > 11.00 && points.danger <= 16.00){
                 textView.text = "INSEGURO"
                 textView.setTextColor(Color.parseColor("#c40700"))
+                view.setBackgroundColor(Color.parseColor("#c40700"))
             }else if(points.danger > 16.00){
                 textView.text = "BUZO QUE SE MUERE"
                 textView.setTextColor(Color.parseColor("#400909"))
+                view.setBackgroundColor(Color.parseColor("#400909"))
             }
 
 
