@@ -67,7 +67,7 @@ class LogInActivity : AppCompatActivity() {
                     snack.show()
 
                 }else{
-                    writeToFile("true")
+                    writeToFile(res.user.username)
                     btnIniciar.isEnabled = true
                     val intent = Intent(this,MainActivity::class.java)
                     startActivity(intent)

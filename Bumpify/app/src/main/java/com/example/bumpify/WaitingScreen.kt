@@ -40,7 +40,7 @@ class WaitingScreen : AppCompatActivity() {
             val reader = BufferedReader(InputStreamReader(gpxfile))
             val linea = reader.readLine()
 
-            if(linea == "true"){
+            if(linea.isNotEmpty()){
                 return true
             }
 
