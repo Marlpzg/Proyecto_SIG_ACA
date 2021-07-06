@@ -50,6 +50,8 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.io.File
+import java.io.FileWriter
 import java.util.*
 
 
@@ -60,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map : MapView
     private lateinit var mLocationOverlay: MyLocationNewOverlay
     private lateinit var runnable: Runnable
+    private var flag = true
 
     private lateinit var viewModel: MainViewModel
     data class Req(@SerializedName("data") val data: Array<Point>,@SerializedName("dangerLevel") val danger: Double)
@@ -73,8 +76,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id: Int = item.getItemId()
         if (id == R.id.logout_menu) {
+            flag=false
+            writeToFile()
             val intent = Intent(this, LogInActivity::class.java)
             startActivity(intent)
+            this.finish()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -181,8 +187,10 @@ class MainActivity : AppCompatActivity() {
         var mHandler = Handler()
 
         runnable = Runnable {
-            viewModel.getPost("{\"lat\": "+mLocationOverlay.myLocation.latitude+", \"lon\": "+mLocationOverlay.myLocation.longitude+"}")
-            mHandler.postDelayed(runnable,5000L)
+            if(flag){
+                viewModel.getPost("{\"lat\": "+mLocationOverlay.myLocation.latitude+", \"lon\": "+mLocationOverlay.myLocation.longitude+"}")
+                mHandler.postDelayed(runnable,5000L)
+            }
         }
         mLocationOverlay.runOnFirstFix(runnable)
 
@@ -260,6 +268,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         val locationbtn: View = findViewById(R.id.mylocation)
+        flag=true
         comprobar()
         locationbtn.setOnClickListener {
             mLocationOverlay.enableFollowLocation()
@@ -289,6 +298,24 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra("latitude", mLocationOverlay.myLocation.latitude)
         intent.putExtra("longitude", mLocationOverlay.myLocation.longitude)
         startActivity(intent)
+    }
+
+    //Función para escribir a un archivo
+    fun writeToFile() {
+        val dir = File(filesDir, "mydir")
+
+        if (!dir.exists()) {
+            dir.mkdir()
+        }
+
+        try {
+            Log.d("TAG", dir.toString())
+            val gpxfileold = File(dir, "sesion.txt")
+            gpxfileold.delete()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 
