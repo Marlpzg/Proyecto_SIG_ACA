@@ -27,6 +27,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.view.Menu
+import android.view.MenuItem
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -62,6 +65,21 @@ class MainActivity : AppCompatActivity() {
     data class Req(@SerializedName("data") val data: Array<Point>,@SerializedName("dangerLevel") val danger: Double)
     data class Point(@SerializedName("coords") val coor: Array<Double>,@SerializedName("type") val type: Int)
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id: Int = item.getItemId()
+        if (id == R.id.logout_menu) {
+            val intent = Intent(this, LogInActivity::class.java)
+            startActivity(intent)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,6 +104,11 @@ class MainActivity : AppCompatActivity() {
 
         //inflate and create the map
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(findViewById(R.id.myToolbar))
+
+
+
         map = findViewById<MapView>(R.id.map)
         map.minZoomLevel = 16.0
         map.maxZoomLevel = 18.0
