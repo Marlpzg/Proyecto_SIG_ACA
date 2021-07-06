@@ -41,17 +41,16 @@ router.post('/add', function (req, res, next) {
         gender: req.body.genero
       }
       const collection = client.db(process.env.DATABASE_NAME).collection("users");
-      //collection.createIndex( { "username" : 1 }, { unique : true } );
-      //collection.createIndex( { "email" : 1 }, { unique : true } );
+
       collection.insertOne(user).then(value => {
-        res.status(200).json({ msg: "Usuario registrado exitosamente." });
+        res.json({ res: JSON.stringify({"data": "Se ha registrado correctamente" })}).status(500);
       }).catch(error => {
         if (error.keyValue.username) {
-          res.status(500).json({ msg: "El nombre de usuario ya existe." });
+          res.json({ res: JSON.stringify({"data": "El nombre de usuario que intenta registrar ya está en uso" })}).status(500);
         } else if (error.keyValue.email) {
-          res.status(500).json({ msg: "Esa dirección de correo ya ha sido utilizada." });
+          res.json({ res: JSON.stringify({"data": "La dirección de correo ingresada ya está en uso" })}).status(500);
         } else {
-          res.status(500).json({ msg: "Ocurrió un error al ingresar el usuario." });
+          res.json({ res: JSON.stringify({"data": "Ocurrió un error inesperado" })}).status(500);
         }
 
       })
@@ -97,7 +96,7 @@ router.get('/validate', function (req, res, next) {
             } 
           }) }).status(401)
         } else {
-          console.log(result[0]);
+          //console.log(result[0]);
           res.json({ user: JSON.stringify({ "data": result[0] }) }).status(200);
           client.close();
         }

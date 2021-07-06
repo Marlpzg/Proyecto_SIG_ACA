@@ -22,6 +22,8 @@ var router = express.Router();
 var db = require('../utils/conn');
 var converter = require('../utils/converter');
 
+const oneDay = 24 * 60 * 60 * 1000;
+
 router.get('/test', function (req, res, next) {
   let client = db.client();
 
@@ -45,6 +47,13 @@ router.get('/test', function (req, res, next) {
 
 });
 
+/*
+1 - Asalto
+2 - Bache
+3 - Obstáculo
+4 - Asesinato
+*/
+
 router.get('/surroundings', function (req, res, next) {
 
   //console.log(req.headers.location);
@@ -60,7 +69,21 @@ router.get('/surroundings', function (req, res, next) {
     } else {
       const collection = client.db(process.env.DATABASE_NAME).collection("events");
 
-      collection.find({ coords: { $geoWithin: { $centerSphere: [[lon, lat], converter.km2rad(5)] } } }).project({ "_id": 0, "coords": 1, "type": 1 })
+      let filter1 = {
+        $and: [
+          { coords: { $geoWithin: { $centerSphere: [[lon, lat], converter.km2rad(5)] } } },
+          {
+            $or: [
+              { type: 1, date: { $gte: new Date((new Date().getTime() - (30 * oneDay))) } },
+              { type: 2, date: { $gte: new Date((new Date().getTime() - (7 * oneDay))) } },
+              { type: 3, date: { $gte: new Date((new Date().getTime() - (oneDay))) } },
+              { type: 4, date: { $gte: new Date((new Date().getTime() - (30 * oneDay))) } }
+            ]
+          }
+        ]
+      }
+
+      collection.find(filter1).project({ "_id": 0, "coords": 1, "type": 1 })
         .toArray((err, result) => {
 
           if (err) res.json(err).status(500)
@@ -85,7 +108,8 @@ router.get('/surroundings', function (req, res, next) {
                     { type: 1 },
                     { type: 4 }
                   ]
-                }
+                },
+                { date: { $gte: new Date((new Date().getTime() - (30 * oneDay))) } }
               ]
             }
             collection.find(filter).project({ "_id": 0 })
@@ -97,11 +121,13 @@ router.get('/surroundings', function (req, res, next) {
                   result.forEach(p => {
                     dangerPoints++;
                     p.votes.forEach(v => {
-                      dangerPoints += v[1];
+                      dangerPoints++;
                     })
                   })
 
-                  res.json({ points: JSON.stringify({ "data": points })/*, dangerLevel: dangerPoints */}).status(200);
+                  //console.log(points);
+
+                  res.json({ points: JSON.stringify({ "data": points, "dangerLevel": dangerPoints }) }).status(200);
                   client.close();
 
                 }
@@ -125,18 +151,17 @@ router.post('/newEvent', function (req, res, next) {
       res.json(err).status(500);
     } else {
 
-      let lon = req.body.lon;
-      let lat =  req.body.lat;
-
-      let event = {
-        date: new Date(),
-        type: req.body.type,
-        desc: req.body.desc,
-        coords: [lon, lat],
-        votes: []
-      }
+      let lon = req.body.lat;
+      let lat = req.body.lon;
+      let nDays = 0;
 
       const collection = client.db(process.env.DATABASE_NAME).collection("events");
+      if (req.body.type == 1 || req.body.type == 4) {
+        nDays = 30;
+      } else {
+        nDays = 1;
+      }
+
       let filter = {
         $and: [
           {
@@ -144,34 +169,71 @@ router.post('/newEvent', function (req, res, next) {
               $geoWithin: {
                 $centerSphere: [
                   [lon, lat],
-                  converter.km2rad(0.05)
+                  converter.km2rad(0.1)
                 ]
               }
             }
           },
           {
-            type: req.body.type        
+            type: req.body.type,
+            date: { $gte: new Date((new Date().getTime() - (nDays * oneDay))) }
           }
         ]
       }
-      console.log(event);
-      
-      collection.find(filter).project({ "_id": 0 })
+
+      collection.find(filter)
         .toArray((err, result) => {
 
           if (err) res.json(err).status(500)
           else {
+            let event = {};
+            if (result.length > 0) {
+              //Update
+              event = result[0];
 
-            console.log(result);
+              if (!event.votes.includes(req.body.user) &&
+                event.user != req.body.user) {
+                event.votes.push(req.body.user);
+                collection.updateOne(
+                  { "_id": event._id },
+                  { $set: { "votes": event.votes, "date": new Date() } })
+                  .then(ev => {
+                    res.json({ points: JSON.stringify({ "success": true }) }).status(200);
+                  }).catch(err => {
+                    res.json({ points: JSON.stringify({ "success": false }) }).status(400);
+                  }).finally(() => {
+                    client.close();
+                  })
+              } else {
+                res.json({ points: JSON.stringify({ "success": true }) }).status(200);
+              }
+
+            } else {
+              //Create new
+              event = {
+                user: req.body.user,
+                date: new Date(),
+                type: req.body.type,
+                desc: req.body.desc,
+                coords: [lon, lat],
+                votes: []
+              }
+
+              collection.insertOne(event).then(ev => {
+                res.json({ points: JSON.stringify({ "success": true }) }).status(200);
+              }).catch(err => {
+                res.json({ points: JSON.stringify({ "success": false }) }).status(400);
+              }).finally(() => {
+                client.close();
+              })
+
+            }
             //res.json({ response: "text" }).status(200);
-            res.json({ points: JSON.stringify({ "data": result })}).status(200);
-            client.close();
-
           }
 
         });
 
-      
+
     }
   });
 
@@ -184,16 +246,3 @@ router.get('/', function (req, res, next) {
 });
 
 module.exports = router;
-
-/*dbClient.connect(error => {
-    const collection = dbClient.db(process.env.DATABASE_NAME).collection("test");
-
-    collection.insertOne({ test: "Yes" })
-      .then(res => {
-        console.log("Wena bro.")
-        dbClient.close();
-      })
-      .catch(err => {
-        console.log(err)
-      });
-  });*/
