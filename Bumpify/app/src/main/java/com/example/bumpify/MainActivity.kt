@@ -176,9 +176,9 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         if (requestCode == FINE_LOCATION_PERMISSIONS_CODE) {
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -234,6 +234,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         mLocationOverlay.runOnFirstFix(runnable)
+
+        val reportbtn: View = findViewById(R.id.report)
 
         viewModel.myResponse.observe(this, { response ->
 
@@ -293,6 +295,11 @@ class MainActivity : AppCompatActivity() {
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 map.overlays.add(marker)
             }
+
+            if (!reportbtn.isEnabled){
+                reportbtn.isEnabled = true
+            }
+
         })
     }
 
@@ -319,6 +326,9 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         val locationbtn: View = findViewById(R.id.mylocation)
+        val reportbtn: View = findViewById(R.id.report)
+        reportbtn.isEnabled = false
+
         flag=true
         comprobar()
         locationbtn.setOnClickListener {
@@ -327,6 +337,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         map.invalidate()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        flag = false
     }
 
     /*override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

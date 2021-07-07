@@ -63,4 +63,8 @@ class OptionsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    fun goBack(v: View){
+        var intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
 }

@@ -12,13 +12,14 @@
         android:orientation="vertical"
         android:background="@color/backgroundorange"
         >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Seleccione una opción"
             android:textColor="@color/white"
             android:textSize="25dp"
-            android:layout_marginBottom="20dp"></TextView>
+            android:layout_marginBottom="20dp" />
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,11 +39,12 @@
             android:layout_margin="10dp"
             android:layout_marginBottom="10dp"
             app:cardCornerRadius="10dp">
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:src="@drawable/triangle"></ImageView>
+                android:src="@drawable/triangle" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:id="@+id/btnbump"
@@ -54,11 +56,12 @@
             android:layout_margin="10dp"
             android:layout_marginBottom="10dp"
             app:cardCornerRadius="10dp">
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:src="@drawable/bump"></ImageView>
+                android:src="@drawable/bump" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:id="@+id/btnThief"
@@ -69,11 +72,12 @@
             android:layout_margin="10dp"
             android:layout_marginBottom="10dp"
             app:cardCornerRadius="10dp">
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:src="@drawable/robber"></ImageView>
+                android:src="@drawable/robber" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:id="@+id/btnAssesination"
@@ -85,31 +89,46 @@
             android:layout_margin="10dp"
             android:layout_marginBottom="10dp"
             app:cardCornerRadius="10dp">
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:src="@drawable/asesinato"></ImageView>
+                android:src="@drawable/asesinato" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:id="@+id/btnCrash"
-            android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_columnWeight="1"
             android:layout_marginLeft="10dp"
+            android:layout_columnSpan="2"
             android:layout_margin="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
             app:cardCornerRadius="10dp">
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:src="@drawable/crash"></ImageView>
+                android:src="@drawable/crash" />
         </androidx.cardview.widget.CardView>
 
 
     </GridLayout>
 
     </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/report"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:backgroundTint="@color/backgroundorange"
+        android:onClick="goBack"
+        app:fabCustomSize="70dp"
+        app:maxImageSize="45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_keyboard_backspace_24"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
