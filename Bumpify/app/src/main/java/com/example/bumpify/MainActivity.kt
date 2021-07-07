@@ -62,12 +62,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map : MapView
     private lateinit var mLocationOverlay: MyLocationNewOverlay
     private lateinit var runnable: Runnable
-    private var flag = true
+    private var flag = true //Se ocupa para interrumpir las llamadas a la API cuando se desee.
     private lateinit var runnableBlinking: Runnable
     private var colorString: String = "FFFFFF"
-    private val types  = arrayOf("Asalto","Bache","Obstáculo","Asesinato","Choque")
+    private val types  = arrayOf("Asalto","Bache","Obstáculo","Asesinato","Choque") //Se ocupa para acceder a los nombres de los eventos más fácilmente
 
     private lateinit var viewModel: MainViewModel
+
+    //Modelos donde se guardan los datos resultantes de las llamadas a la API
     data class Req(@SerializedName("data") val data: Array<Point>,@SerializedName("dangerLevel") val danger: Double)
     data class Point(@SerializedName("coords") val coor: Array<Double>,@SerializedName("type") val type: Int,@SerializedName("desc") val desc: String,@SerializedName("date") val date: Date,@SerializedName("votesNum") val votes: Int)
 
@@ -88,11 +90,10 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //handle permissions first, before map is created. not depicted here
+        //Verificación de los permisos antes que se cree el mapa
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "You have already granted this permission!",
@@ -101,39 +102,31 @@ class MainActivity : AppCompatActivity() {
             requestLocationPermission();
         }
 
-        //load/initialize the osmdroid configuration, this can be done
-        // This won't work unless you have imported this: org.osmdroid.config.Configuration.*
+        //Cargar la configuración inicial de osmdroid
         getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
-        //setting this before the layout is inflated is a good idea
-        //it 'should' ensure that the map has a writable location for the map cache, even without permissions
-        //if no tiles are displayed, you can try overriding the cache path using Configuration.getInstance().setCachePath
-        //see also StorageUtils
-        //note, the load method also sets the HTTP User Agent to your application's package name, if you abuse osm's
-        //tile servers will get you banned based on this string.
 
-        //inflate and create the map
+        //Crear el mapa
         setContentView(R.layout.activity_main)
-
         setSupportActionBar(findViewById(R.id.myToolbar))
 
 
-
+        //Configuraciones del mapa
         map = findViewById<MapView>(R.id.map)
         map.minZoomLevel = 16.0
         map.maxZoomLevel = 18.0
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
 
+        //Obtener y mostrar posición del usuario
         mLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(applicationContext), map)
         mLocationOverlay.enableMyLocation()
         mLocationOverlay.enableFollowLocation()
         map.overlays.add(mLocationOverlay)
-
-
         map.zoomToBoundingBox(mLocationOverlay.bounds, false)
 
         map.invalidate()
 
+        //Snackbar que avisa si el reporte fue guardado correctamente.
         var intent = intent
         if(intent.hasExtra("mensaje")){
             var mensaje = intent.getStringExtra("mensaje")
@@ -145,6 +138,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Pedir permisos al usuario para usar el GPS y acceder a su posición.
+     */
     private fun requestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
@@ -183,20 +179,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun quemar() = runBlocking { // this: CoroutineScope
-        launch { // launch a new coroutine and continue
-            delay(5000L)
-        }
-
-    }
-
+    /**
+     * Se encarga de hacer llamadas a la API y procesar la información para mostrarla en el mapa.
+     * Se hace una llamada cada 5 segundos y se envía la posición actual.
+     * La API retorna todos los eventos que se encuentren en un radio de 5km alrededor de la persona.
+     * Dichos eventos se clasifican y se agregan como Markers al mapa.
+     * Se calcula el nivel de peligro dependiendo de la cantidad de eventos peligrosos cercanos a la persona.
+     * El radar de peligro tiene 500m de diámetro.
+     */
     fun comprobar(){
 
-        val repository = Repository()
-        val viewModelFactory = MainViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
-        var mHandler = Handler()
         var mHandlerBlinking = Handler()
 
         var alphaVar = 0
@@ -208,6 +200,9 @@ class MainActivity : AppCompatActivity() {
 
         var cal = Calendar.getInstance()
         var dateformat = SimpleDateFormat("dd/MM/yyyy\nhh:mm a")
+
+        //Parpadeo del color en el borde del mapa que indica el nivel de peligro.
+        //Se cambia el brillo del color.
         runnableBlinking = Runnable {
             if(flag){
                 r = ""+colorString[0]+colorString[1]
@@ -227,22 +222,35 @@ class MainActivity : AppCompatActivity() {
         }
         mHandlerBlinking.postDelayed(runnableBlinking,100L)
 
+        //Creación de los objetos de Retrofit
+        val repository = Repository()
+        val viewModelFactory = MainViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
+
+        //Llamada a la API cada 5 segundos. Se envía latitud y longitud actual.
+        var mHandler = Handler()
         runnable = Runnable {
             if(flag){
                 viewModel.getPost("{\"lat\": "+mLocationOverlay.myLocation.latitude+", \"lon\": "+mLocationOverlay.myLocation.longitude+"}")
                 mHandler.postDelayed(runnable,5000L)
             }
         }
+
+        //Si el mLocationOverlay.myLocation.latitude y .longitude no están dentro de runOnFirstFix no retornan la posición actual.
         mLocationOverlay.runOnFirstFix(runnable)
 
         val reportbtn: View = findViewById(R.id.report)
 
+        //Manejo de los datos recibidos de la API
         viewModel.myResponse.observe(this, { response ->
 
+            //La respuesta de la API se guarda en el modelo definido al inicio del archivo.
             val points: Req = Gson().fromJson(response.points, Req::class.java)
 
             val textView: TextView = findViewById(R.id.tv_danger)
 
+            //Cálculo del nivel de peligro
             if(points.danger <= 2.00){
                 textView.text = "SEGURO"
                 textView.setTextColor(Color.parseColor("#0068c9"))
@@ -269,12 +277,13 @@ class MainActivity : AppCompatActivity() {
                 colorString="400909"
             }
 
-
+            //Se borran los markers con cada llamada usando su ID.
             map.overlays.forEach {
                 if (it is Marker && it.id == "Marker") {
                     map.overlays.remove(it)
                 }
             }
+            //Se colocan los Markers nuevos y se agregan los íconos customizados.
             for (p in points.data) {
                 var marker = Marker(map)
                 marker.position = GeoPoint(p.coor[1], p.coor[0])
@@ -289,7 +298,7 @@ class MainActivity : AppCompatActivity() {
 
                 cal.time = p.date
                 cal.add(Calendar.HOUR,-6)
-
+                //InfoWindow que se ve al dar click a cada Marker
                 marker.title = " - "+types[p.type-1]+" - \n"+ (if(p.desc.isNotEmpty()) p.desc else "Sin descripción")+"\n \n"+ dateformat.format(cal.time)+"\n \nVotos: "+ p.votes
                 marker.id = "Marker"
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -345,21 +354,9 @@ class MainActivity : AppCompatActivity() {
         flag = false
     }
 
-    /*override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        val permissionsToRequest = ArrayList<String>()
-        var i = 0
-        while (i < grantResults.size) {
-            permissionsToRequest.add(permissions[i])
-            i++
-        }
-        if (permissionsToRequest.size > 0) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.toTypedArray(),
-                REQUEST_PERMISSIONS_REQUEST_CODE)
-        }
-    }*/
-
+    /**
+     * Abrir Activity para reportar incidentes.
+     */
     fun abrirReporte(v: View){
 
         val intent = Intent(this, OptionsActivity::class.java)
@@ -368,7 +365,11 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    //Función para escribir a un archivo
+    /**
+     * Eliminar la sesión actual al dar click en el botón de cerrar sesión.
+     * Se elimina el archivo donde se guarda el nombre de usuario.
+     * Se creará uno nuevo al volver a iniciar sesión.
+     */
     fun writeToFile() {
         val dir = File(filesDir, "mydir")
 
@@ -385,22 +386,4 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
-
-
-    /*private fun requestPermissionsIfNecessary(String[] permissions) {
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (String permission : permissions) {
-        if (ContextCompat.checkSelfPermission(this, permission)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            permissionsToRequest.add(permission);
-        }
-    }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }
-    }*/
 }

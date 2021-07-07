@@ -10,13 +10,14 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.util.*
 
+/**
+ * Código Boilerplate necesario para el uso de la libreria Retrofit
+ * Se puede ver más en: https://square.github.io/retrofit/
+ */
 class MainViewModel( private val repository: Repository): ViewModel() {
 
     val myResponse: MutableLiveData<Post> = MutableLiveData()
     val myRespuesta: MutableLiveData<Response<Respuesta>> = MutableLiveData()
-    val myUser: MutableLiveData<Response<User>> = MutableLiveData()
-    val myReport: MutableLiveData<Response<ReportModel>> = MutableLiveData()
-    val getUs: MutableLiveData<Response<UserSignIn>> = MutableLiveData()
     val getUsu: MutableLiveData<Response<UserReq>> = MutableLiveData()
     val getString: MutableLiveData<Response<String>> = MutableLiveData()
 
