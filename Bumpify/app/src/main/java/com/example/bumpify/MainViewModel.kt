@@ -8,14 +8,17 @@ import com.example.bumpify.model.*
 import com.example.bumpify.repository.Repository
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.util.*
 
 class MainViewModel( private val repository: Repository): ViewModel() {
 
     val myResponse: MutableLiveData<Post> = MutableLiveData()
+    val myRespuesta: MutableLiveData<Response<Respuesta>> = MutableLiveData()
     val myUser: MutableLiveData<Response<User>> = MutableLiveData()
     val myReport: MutableLiveData<Response<ReportModel>> = MutableLiveData()
     val getUs: MutableLiveData<Response<UserSignIn>> = MutableLiveData()
     val getUsu: MutableLiveData<Response<UserReq>> = MutableLiveData()
+    val getString: MutableLiveData<Response<String>> = MutableLiveData()
 
     fun getPost(location:String){
         viewModelScope.launch {
@@ -27,18 +30,10 @@ class MainViewModel( private val repository: Repository): ViewModel() {
     fun pushUser(user: User){
         viewModelScope.launch {
             val response = repository.pushUser(user)
-            myUser.value = response
+            myRespuesta.value = response
         }
     }
 
-    fun getUser(userSignIn: UserSignIn){
-        viewModelScope.launch {
-            val response = repository.getUser(userSignIn)
-
-
-            getUs.value = response
-        }
-    }
 
     fun getUsu(usuario: String, password: String){
         viewModelScope.launch{

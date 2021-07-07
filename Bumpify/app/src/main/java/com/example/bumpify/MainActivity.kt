@@ -294,6 +294,7 @@ class MainActivity : AppCompatActivity() {
     }*/
 
     fun abrirReporte(v: View){
+
         val intent = Intent(this, OptionsActivity::class.java)
         intent.putExtra("latitude", mLocationOverlay.myLocation.latitude)
         intent.putExtra("longitude", mLocationOverlay.myLocation.longitude)

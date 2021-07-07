@@ -15,8 +15,7 @@ interface SimpleApi {
     @POST("users/add")
     suspend fun pushUser(
         @Body user: User
-    ): Response<User>
-
+    ): Response<Respuesta>
     @POST("users/validate")
     suspend fun getUser(
         @Body userSignIn: UserSignIn
