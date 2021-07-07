@@ -19,7 +19,6 @@ Licensed to the Apache Software Foundation (ASF) under one
 package com.example.bumpify
 
 import android.Manifest
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -27,9 +26,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -49,10 +48,10 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.infowindow.InfoWindow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.io.File
-import java.io.FileWriter
 import java.util.*
 
 
@@ -64,6 +63,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mLocationOverlay: MyLocationNewOverlay
     private lateinit var runnable: Runnable
     private var flag = true
+    private lateinit var runnableBlinking: Runnable
+    private var colorString: String = "FFFFFF"
 
     private lateinit var viewModel: MainViewModel
     data class Req(@SerializedName("data") val data: Array<Point>,@SerializedName("dangerLevel") val danger: Double)
@@ -132,7 +133,14 @@ class MainActivity : AppCompatActivity() {
 
         map.invalidate()
 
-
+        var intent = intent
+        if(intent.hasExtra("mensaje")){
+            var mensaje = intent.getStringExtra("mensaje")
+            val contexto = findViewById<View>(R.id.mainactivitycontainer)
+            val snack = Snackbar.make(contexto, mensaje.toString(), Snackbar.LENGTH_INDEFINITE);
+            snack.setAction("Aceptar", View.OnClickListener { snack.dismiss() })
+            snack.show()
+        }
 
     }
 
@@ -188,6 +196,33 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
         var mHandler = Handler()
+        var mHandlerBlinking = Handler()
+
+        var alphaVar = 0
+        var incr = true
+        val view: View = this.findViewById<View>(R.id.map).rootView
+        var r = ""
+        var g = ""
+        var b = ""
+
+        runnableBlinking = Runnable {
+            if(flag){
+                r = ""+colorString[0]+colorString[1]
+                g = ""+colorString[2]+colorString[3]
+                b = ""+colorString[4]+colorString[5]
+                view.setBackgroundColor(Color.rgb(r.toInt(16)+alphaVar,g.toInt(16)+alphaVar,b.toInt(16)+alphaVar))
+                if (incr) {
+                    alphaVar += 5
+                    if (alphaVar >= 30) incr=false
+                }else {
+                    alphaVar -= 5
+                    if (alphaVar <= 0) incr=true
+                }
+
+                mHandlerBlinking.postDelayed(runnableBlinking,100L)
+            }
+        }
+        mHandlerBlinking.postDelayed(runnableBlinking,100L)
 
         runnable = Runnable {
             if(flag){
@@ -200,34 +235,33 @@ class MainActivity : AppCompatActivity() {
         viewModel.myResponse.observe(this, { response ->
 
             val points: Req = Gson().fromJson(response.points, Req::class.java)
-            val textView: TextView = findViewById(R.id.tv_danger)
 
-            val view: View = this.findViewById<View>(R.id.map).rootView
+            val textView: TextView = findViewById(R.id.tv_danger)
 
             if(points.danger <= 2.00){
                 textView.text = "SEGURO"
                 textView.setTextColor(Color.parseColor("#0068c9"))
-                view.setBackgroundColor(Color.parseColor("#0068c9"))
+                colorString="0068c9"
             }else if(points.danger > 2.00 && points.danger <= 5.00){
                 textView.text = "MAYORMENTE SEGURO"
                 textView.setTextColor(Color.parseColor("#00a336"))
-                view.setBackgroundColor(Color.parseColor("#00a336"))
+                colorString="00a336"
             }else if(points.danger > 5.00 && points.danger <= 8.00){
                 textView.text = "MODERADO"
                 textView.setTextColor(Color.parseColor("#e6da00"))
-                view.setBackgroundColor(Color.parseColor("#e6da00"))
+                colorString="e6da00"
             }else if(points.danger > 8.00 && points.danger <= 11.00){
                 textView.text = "POCO SEGURO"
                 textView.setTextColor(Color.parseColor("#e06c00"))
-                view.setBackgroundColor(Color.parseColor("#e06c00"))
+                colorString="e06c00"
             }else if(points.danger > 11.00 && points.danger <= 16.00){
                 textView.text = "INSEGURO"
                 textView.setTextColor(Color.parseColor("#c40700"))
-                view.setBackgroundColor(Color.parseColor("#c40700"))
+                colorString="c40700"
             }else if(points.danger > 16.00){
                 textView.text = "BUZO QUE SE MUERE"
                 textView.setTextColor(Color.parseColor("#400909"))
-                view.setBackgroundColor(Color.parseColor("#400909"))
+                colorString="400909"
             }
 
 
@@ -239,7 +273,7 @@ class MainActivity : AppCompatActivity() {
             for (p in points.data) {
                 var marker = Marker(map)
                 marker.position = GeoPoint(p.coor[1], p.coor[0])
-                //marker.icon = ContextCompat.getDrawable(this, R.drawable.marker_icon)
+                marker.icon = ContextCompat.getDrawable(this, R.drawable.marker_icon)
                 marker.title = p.type.toString()
                 marker.id = "Marker"
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
