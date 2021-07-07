@@ -48,16 +48,16 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.infowindow.InfoWindow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.io.File
+import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
-    private val COARSE_LOCATION_PERMISSIONS_CODE = 2
     private val FINE_LOCATION_PERMISSIONS_CODE = 3
     private lateinit var map : MapView
     private lateinit var mLocationOverlay: MyLocationNewOverlay
@@ -65,10 +65,11 @@ class MainActivity : AppCompatActivity() {
     private var flag = true
     private lateinit var runnableBlinking: Runnable
     private var colorString: String = "FFFFFF"
+    private val types  = arrayOf("Asalto","Bache","Obstáculo","Asesinato","Choque")
 
     private lateinit var viewModel: MainViewModel
     data class Req(@SerializedName("data") val data: Array<Point>,@SerializedName("dangerLevel") val danger: Double)
-    data class Point(@SerializedName("coords") val coor: Array<Double>,@SerializedName("type") val type: Int)
+    data class Point(@SerializedName("coords") val coor: Array<Double>,@SerializedName("type") val type: Int,@SerializedName("desc") val desc: String,@SerializedName("date") val date: Date,@SerializedName("votesNum") val votes: Int)
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
@@ -205,6 +206,8 @@ class MainActivity : AppCompatActivity() {
         var g = ""
         var b = ""
 
+        var cal = Calendar.getInstance()
+        var dateformat = SimpleDateFormat("dd/MM/yyyy\nhh:mm a")
         runnableBlinking = Runnable {
             if(flag){
                 r = ""+colorString[0]+colorString[1]
@@ -273,10 +276,21 @@ class MainActivity : AppCompatActivity() {
             for (p in points.data) {
                 var marker = Marker(map)
                 marker.position = GeoPoint(p.coor[1], p.coor[0])
-                marker.icon = ContextCompat.getDrawable(this, R.drawable.marker_icon)
-                marker.title = p.type.toString()
+
+                when(p.type){
+                    1 -> marker.icon = ContextCompat.getDrawable(this, R.mipmap.ladron_marker)
+                    2 -> marker.icon = ContextCompat.getDrawable(this, R.mipmap.bache_marker)
+                    3 -> marker.icon = ContextCompat.getDrawable(this, R.mipmap.obstaculo_marker)
+                    4 -> marker.icon = ContextCompat.getDrawable(this, R.mipmap.asesinato_marker)
+                    5 -> marker.icon = ContextCompat.getDrawable(this, R.mipmap.choque_marker)
+                }
+
+                cal.time = p.date
+                cal.add(Calendar.HOUR,-6)
+
+                marker.title = " - "+types[p.type-1]+" - \n"+ (if(p.desc.isNotEmpty()) p.desc else "Sin descripción")+"\n \n"+ dateformat.format(cal.time)+"\n \nVotos: "+ p.votes
                 marker.id = "Marker"
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 map.overlays.add(marker)
             }
         })
