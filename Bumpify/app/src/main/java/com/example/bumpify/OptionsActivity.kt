@@ -13,6 +13,7 @@ class OptionsActivity : AppCompatActivity() {
     lateinit var btnCarCrash : CardView
     lateinit var btnThief : CardView
     lateinit var  btnAccident : CardView
+    lateinit var  btnAssesination : CardView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_options)
@@ -20,6 +21,7 @@ class OptionsActivity : AppCompatActivity() {
         btnThief = findViewById(R.id.btnThief)
         btnCarCrash = findViewById(R.id.btnCrash)
         btnBump = findViewById(R.id.btnbump)
+        btnAssesination = findViewById(R.id.btnAssesination)
 
         val intent = getIntent()
         val latitude = intent.getDoubleExtra("latitude", 1.1)
@@ -38,8 +40,12 @@ class OptionsActivity : AppCompatActivity() {
             enviarDatos(3, latitude, longitude, "Obstaculo", R.drawable.triangle)
 
         })
-        btnCarCrash.setOnClickListener(View.OnClickListener {
+        btnAssesination.setOnClickListener(View.OnClickListener {
             enviarDatos(4, latitude, longitude, "Asesinato", R.drawable.asesinato)
+
+        })
+        btnCarCrash.setOnClickListener(View.OnClickListener {
+            enviarDatos(5, latitude, longitude, "Choque", R.drawable.crash)
 
         })
 

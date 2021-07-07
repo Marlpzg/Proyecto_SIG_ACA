@@ -76,7 +76,7 @@
                 android:src="@drawable/robber"></ImageView>
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
-            android:id="@+id/btnCrash"
+            android:id="@+id/btnAssesination"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_columnWeight="1"
@@ -90,6 +90,21 @@
                 android:layout_height="80dp"
                 android:layout_gravity="center"
                 android:src="@drawable/asesinato"></ImageView>
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnCrash"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_columnWeight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_margin="10dp"
+            android:layout_marginBottom="10dp"
+            app:cardCornerRadius="10dp">
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:src="@drawable/crash"></ImageView>
         </androidx.cardview.widget.CardView>
 
 
