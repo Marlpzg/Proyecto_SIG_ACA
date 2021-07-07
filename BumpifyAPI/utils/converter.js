@@ -17,6 +17,11 @@
   under the License.
  */
 
+/**
+ * Función que convierte una distancia provista en kilómetros a radianes.
+ * @param {double} km Distancia en kilómetros a convertir a radianes.
+ * @returns Distancia en radianes.
+ */
 function km2rad(km){
     return km * (0.00025232135647961243439644731530077/1.60934);
 }
