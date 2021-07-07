@@ -38,6 +38,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.bumpify.repository.Repository
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.delay
@@ -130,6 +131,8 @@ class MainActivity : AppCompatActivity() {
         map.zoomToBoundingBox(mLocationOverlay.bounds, false)
 
         map.invalidate()
+
+
 
     }
 

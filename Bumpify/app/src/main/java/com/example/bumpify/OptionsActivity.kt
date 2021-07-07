@@ -26,24 +26,25 @@ class OptionsActivity : AppCompatActivity() {
         val longitude = intent.getDoubleExtra("longitude", 1.1)
 
         btnThief.setOnClickListener(View.OnClickListener {
-            enviarDatos(1, latitude, longitude)
+
+            enviarDatos(1, latitude, longitude, "robo", R.drawable.robber)
 
         })
         btnBump.setOnClickListener(View.OnClickListener {
-            enviarDatos(2, latitude, longitude)
+            enviarDatos(2, latitude, longitude, "Bache", R.drawable.bump)
 
         })
         btnAccident.setOnClickListener(View.OnClickListener {
-            enviarDatos(3, latitude, longitude)
+            enviarDatos(3, latitude, longitude, "Obstaculo", R.drawable.triangle)
 
         })
         btnCarCrash.setOnClickListener(View.OnClickListener {
-            enviarDatos(4, latitude, longitude)
+            enviarDatos(4, latitude, longitude, "Asesinato", R.drawable.asesinato)
 
         })
 
     }
-    fun enviarDatos(id: Int, latitude: Double, longitude: Double){
+    fun enviarDatos(id: Int, latitude: Double, longitude: Double, nombre: String, imagen: Int){
         var intent = Intent(this, ReportActivity::class.java)
         Log.d("latitude", latitude.toString())
         Log.d("longitude", longitude.toString())
@@ -51,6 +52,8 @@ class OptionsActivity : AppCompatActivity() {
         intent.putExtra("id", id)
         intent.putExtra("latitude", latitude)
         intent.putExtra("longitude", longitude)
+        intent.putExtra("name", nombre)
+        intent.putExtra("image", imagen)
         startActivity(intent)
     }
 

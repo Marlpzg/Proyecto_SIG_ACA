@@ -21,7 +21,7 @@ class Repository {
         suspend fun getUs(usuario: String, password: String): Response<UserReq>{
         return RetrofitInstance.api.getUs(usuario, password)
     }
-    suspend fun pushReport(report: ReportModel): Response<ReportModel>{
+    suspend fun pushReport(report: ReportModel): Response<Respuesta>{
         return RetrofitInstance.api.pushReport(report)
     }
 

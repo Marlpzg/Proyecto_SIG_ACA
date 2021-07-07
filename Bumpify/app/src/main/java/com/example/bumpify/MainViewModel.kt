@@ -47,7 +47,7 @@ class MainViewModel( private val repository: Repository): ViewModel() {
     fun pushReport(report: ReportModel){
         viewModelScope.launch {
             val response = repository.pushReport(report)
-            myReport.value = response
+            myRespuesta.value = response
         }
     }
 

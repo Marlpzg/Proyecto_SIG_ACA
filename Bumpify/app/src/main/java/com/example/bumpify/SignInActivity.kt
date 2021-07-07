@@ -46,7 +46,7 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
     private lateinit var repository: Repository
     private lateinit var viewModelFactory: MainViewModelFactory
-    data class Req(@SerializedName("data") val mensaje: String)
+    data class Req(@SerializedName("data") val mensaje: String, @SerializedName("codigo") val codigo: Int)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
@@ -138,9 +138,7 @@ class SignInActivity : AppCompatActivity() {
         if(nombreFlag && apellidoFlag && correoFlag && usuarioFlag && contraFlag && generoFlag) {
             val myPost = User(nombre, apellido, correo, usuario, AESCrypt.encrypt(contra, "hello world"), genero)
             viewModel.pushUser(myPost)
-            var intent = Intent(this, LogInActivity::class.java)
-            intent.putExtra("mensaje", "Se ha registrado el usuario correctamente")
-            startActivity(intent)
+
         }
 
     }
@@ -154,7 +152,17 @@ class SignInActivity : AppCompatActivity() {
         viewModel.myRespuesta.observe(this, Observer { response ->
 
             val res: SignInActivity.Req = Gson().fromJson(response.body()?.res,SignInActivity.Req::class.java)
-            Log.d("Respuesta: ", response.toString())
+            if(res.codigo == 500){
+                val contexto = findViewById<View>(R.id.signincontainer)
+                val snack = Snackbar.make(contexto,res.mensaje, Snackbar.LENGTH_INDEFINITE);
+                snack.setAction("Aceptar",View.OnClickListener { snack.dismiss()})
+                snack.show()
+            }else{
+                var intent = Intent(this, LogInActivity::class.java)
+                intent.putExtra("mensaje", "Se ha registrado el usuario correctamente")
+                startActivity(intent)
+            }
+            Log.d("Respuesta: ", res.codigo.toString())
 
         })
 
@@ -167,17 +175,6 @@ class SignInActivity : AppCompatActivity() {
             return false
         }
         return true
-    }
-    fun encrypt(input: String, password: String): String {
-        //1. Create a cipher object
-        val cipher = Cipher.getInstance("AES")
-        //2. Initialize cipher
-        //The key you specified
-        val keySpec = SecretKeySpec(password.toByteArray(),"AES")
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec)
-        //3. Encryption and decryption
-        val encrypt = cipher.doFinal(input.toByteArray());
-        return Base64.encode(encrypt, DEFAULT).toString()
     }
 
     fun abrirLogIn(v: View){

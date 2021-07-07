@@ -6,19 +6,42 @@
     android:layout_height="match_parent"
     tools:context=".ReportActivity">
     <LinearLayout
+        android:id="@+id/ReportContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/backgroundorange"
         android:gravity="center"
         >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="20dp">
 
+            <ImageView
+                android:id="@+id/iv_report_holder"
+                android:layout_width="100dp"
+                android:layout_height="120dp">
+            </ImageView>
+                <TextView
+                    android:id="@+id/tv_placeholder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="REPORTE PLACEHOLDER"
+                    android:textColor="@color/white"
+                    android:textSize="20dp"></TextView>
+
+
+
+        </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Descripción"
+            android:text="Cuéntanos los detalles"
             android:textColor="@color/white"
-            android:paddingBottom="30dp"
+            android:paddingBottom="10dp"
             android:textSize="20dp"></TextView>
         <EditText
             android:id="@+id/txtDescripcion"
@@ -32,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="enviarReporte"
-            android:text="Enviar"></Button>
+            android:text="Enviar reporte"></Button>
 
     </LinearLayout>
 

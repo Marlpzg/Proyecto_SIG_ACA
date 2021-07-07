@@ -27,5 +27,5 @@ interface SimpleApi {
     @POST("/newEvent")
     suspend fun pushReport(
         @Body report: ReportModel
-    ): Response<ReportModel>
+    ): Response<Respuesta>
 }
