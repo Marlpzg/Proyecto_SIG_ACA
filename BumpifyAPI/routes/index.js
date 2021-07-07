@@ -77,13 +77,14 @@ router.get('/surroundings', function (req, res, next) {
               { type: 1, date: { $gte: new Date((new Date().getTime() - (30 * oneDay))) } },
               { type: 2, date: { $gte: new Date((new Date().getTime() - (7 * oneDay))) } },
               { type: 3, date: { $gte: new Date((new Date().getTime() - (oneDay))) } },
-              { type: 4, date: { $gte: new Date((new Date().getTime() - (30 * oneDay))) } }
+              { type: 4, date: { $gte: new Date((new Date().getTime() - (30 * oneDay))) } },
+              { type: 5, date: { $gte: new Date((new Date().getTime() - (oneDay/4))) } }
             ]
           }
         ]
       }
 
-      collection.find(filter1).project({ "_id": 0, "coords": 1, "type": 1 })
+      collection.find(filter1).project({ "_id": 0, "coords": 1, "type": 1, "desc": 1, "date": 1, "votesNum": {$size: "$votes"} })
         .toArray((err, result) => {
 
           if (err) res.json(err).status(500)
@@ -118,7 +119,7 @@ router.get('/surroundings', function (req, res, next) {
                 if (err) res.json(err).status(500)
                 else {
                   dangerPoints = 0;
-                  result.forEach(p => {
+                  result.forEach((p, index) => {
                     dangerPoints++;
                     p.votes.forEach(v => {
                       dangerPoints++;
@@ -184,7 +185,7 @@ router.post('/newEvent', function (req, res, next) {
       collection.find(filter)
         .toArray((err, result) => {
 
-          if (err) res.json(err).status(500)
+          if (err) res.json({ res: JSON.stringify({"data": "Error de conexión a la base de datos", "codigo": 500 })}).status(500);
           else {
             let event = {};
             if (result.length > 0) {
@@ -198,14 +199,14 @@ router.post('/newEvent', function (req, res, next) {
                   { "_id": event._id },
                   { $set: { "votes": event.votes, "date": new Date() } })
                   .then(ev => {
-                    res.json({ points: JSON.stringify({ "success": true }) }).status(200);
+                    res.json({ res: JSON.stringify({"data": "¡Gracias por tu reporte!", "codigo": 200 })}).status(200);
                   }).catch(err => {
-                    res.json({ points: JSON.stringify({ "success": false }) }).status(400);
+                    res.json({ res: JSON.stringify({"data": "Ha ocurrido un error al procesar tu reporte", "codigo": 500 })}).status(500);
                   }).finally(() => {
                     client.close();
                   })
               } else {
-                res.json({ points: JSON.stringify({ "success": true }) }).status(200);
+                res.json({ res: JSON.stringify({"data": "¡Gracias por tu reporte!", "codigo": 200 })}).status(200);
               }
 
             } else {
@@ -220,9 +221,9 @@ router.post('/newEvent', function (req, res, next) {
               }
 
               collection.insertOne(event).then(ev => {
-                res.json({ points: JSON.stringify({ "success": true }) }).status(200);
+                res.json({ res: JSON.stringify({"data": "¡Gracias por tu reporte!", "codigo": 200 })}).status(200);
               }).catch(err => {
-                res.json({ points: JSON.stringify({ "success": false }) }).status(400);
+                res.json({ res: JSON.stringify({"data": "Ha ocurrido un error al procesar tu reporte", "codigo": 500 })}).status(500);
               }).finally(() => {
                 client.close();
               })
