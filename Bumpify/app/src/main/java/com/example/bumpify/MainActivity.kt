@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
             val points: Req = Gson().fromJson(response.points, Req::class.java)
             val textView: TextView = findViewById(R.id.tv_danger)
 
-            val view: View = this.findViewById<View>(android.R.id.content).rootView
+            val view: View = this.findViewById<View>(R.id.map).rootView
 
             if(points.danger <= 2.00){
                 textView.text = "SEGURO"

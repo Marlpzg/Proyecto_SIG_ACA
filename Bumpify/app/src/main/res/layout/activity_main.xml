@@ -8,6 +8,8 @@
     android:padding="6dp"
     android:id="@+id/mainactivitycontainer">
 
+    >
+
     <!-- Toolbar-->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -30,17 +32,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:theme="?attr/actionBarTheme"
-                app:title=":)" />
+                app:title=" " />
 
-            <!--            <ImageView-->
-            <!--                android:id="@+id/imageView"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginEnd="15dp"-->
-            <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--                app:layout_constraintEnd_toEndOf="parent"-->
-            <!--                app:layout_constraintTop_toTopOf="parent"-->
-            <!--                app:srcCompat="@drawable/ic_sharp_more_vert_24" />-->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="48dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toBottomOf="@+id/myToolbar"
+                app:layout_constraintStart_toStartOf="@+id/myToolbar"
+                app:layout_constraintTop_toTopOf="@+id/myToolbar"
+                app:layout_constraintVertical_bias="0.0"
+                app:srcCompat="@drawable/siren" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -50,9 +55,12 @@
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
+        android:layout_margin="6dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar" />
+        app:layout_constraintTop_toBottomOf="@+id/appbar"
+        android:background="@drawable/border" />
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/report"
@@ -86,6 +94,7 @@
         android:text="Nivel de peligro: "
         android:textSize="25dp"
         android:textStyle="bold"
+        android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/appbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
