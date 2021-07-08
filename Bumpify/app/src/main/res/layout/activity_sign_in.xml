@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignInActivity"
+    android:id="@+id/signincontainer">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@color/backgroundorange"
+        >
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="120dp"
+            android:src="@drawable/siren"
+
+            android:layout_marginBottom="5dp"></ImageView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/registrate"
+            android:textColor="@color/white"
+            android:textFontWeight="10"
+            android:textSize="20dp"
+            android:layout_marginBottom="15dp"></TextView>
+        <EditText
+            android:id="@+id/txtNombre"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Nombre"
+            android:drawableStart="@drawable/pencil"
+            android:drawableTint="@color/white"
+            android:drawablePadding="12dp"
+            android:textColorHint="@color/white"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/white"></EditText>
+        <EditText
+            android:id="@+id/txtApellido"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Apellido"
+            android:drawableStart="@drawable/pencil"
+            android:drawableTint="@color/white"
+            android:drawablePadding="12dp"
+            android:textColorHint="@color/white"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/white"></EditText>
+        <EditText
+            android:id="@+id/txtCorreo"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Correo"
+            android:drawableStart="@drawable/letter"
+            android:drawableTint="@color/white"
+            android:drawablePadding="12dp"
+            android:textColorHint="@color/white"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/white"></EditText>
+        <EditText
+            android:id="@+id/txtUsuario"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Usuario"
+            android:drawableStart="@drawable/user"
+            android:drawableTint="@color/white"
+            android:drawablePadding="12dp"
+            android:textColorHint="@color/white"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/white"></EditText>
+        <EditText
+            android:id="@+id/txtContra"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Contraseña"
+            android:drawableStart="@drawable/key2"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:drawableTint="@color/white"
+            android:backgroundTint="@color/white"
+            android:inputType="textPassword"></EditText>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/género"
+                android:textColor="@color/white"
+               android:textSize="15dp"
+                >
+
+            </TextView>
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/RadioGroupSignIn">
+            <RadioButton
+                android:id="@+id/rdbMasculino"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Masculino"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/white"
+                android:buttonTint="@color/white"
+                android:layout_marginRight="20dp"></RadioButton>
+            <RadioButton
+                android:id="@+id/rdbFemenino"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Femenino"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/white"
+                android:buttonTint="@color/white"></RadioButton>
+        </RadioGroup>
+        </LinearLayout>
+        <Button
+            android:id="@+id/btnRegistrarse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registrarse"
+            android:background="@drawable/buttonborders"
+            android:onClick="enviarDatos"
+            android:textColor="@color/white" ></Button>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signinurl"
+            android:onClick="abrirLogIn"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/orange"
+            android:textFontWeight="10"
+            android:textSize="15dp"
+            ></TextView>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
