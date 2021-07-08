@@ -1,3 +1,21 @@
+/*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+ */
 package com.example.bumpify
 
 import android.content.Intent
@@ -23,6 +41,8 @@ import java.net.SocketTimeoutException
 
 
 class LogInActivity : AppCompatActivity() {
+
+
     lateinit var usuario : EditText
     lateinit var contra: EditText
     private lateinit var viewModel: MainViewModel
@@ -30,14 +50,18 @@ class LogInActivity : AppCompatActivity() {
     private lateinit var viewModelFactory: MainViewModelFactory
     private lateinit var btnIniciar: View
 
-
+    //Modelo donde se guardan las respuestas del servidor
     data class Req(@SerializedName("data") val user: UserModel)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
+
         usuario = findViewById<EditText>(R.id.txtUsuario1)
         contra = findViewById<EditText>(R.id.txtContra1)
 
+        // Muestra snackbar, el mensaje es recibido por medio de un intent.
+        // El intent es enviado desde SignInActivity.
         var intent = intent
         if(intent.hasExtra("mensaje")){
             var mensaje = intent.getStringExtra("mensaje")
@@ -52,19 +76,17 @@ class LogInActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
+        //Configuración para envir datos a la API
         repository  = Repository()
-
         viewModelFactory = MainViewModelFactory(repository)
-
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
         try {
             viewModel.getUsu.observe(this, Observer { response ->
 
 
                 val res: Req = Gson().fromJson(response.body()?.user, Req::class.java)
 
+                //Validación de la respuesta de la API
                 if(res.user.email == "-" && res.user.gender == "-"){
                     val contexto = findViewById<View>(R.id.logincontainer)
                     val snack = Snackbar.make(contexto,"Usuario o contraseña incorrectos", Snackbar.LENGTH_INDEFINITE);
@@ -96,7 +118,11 @@ class LogInActivity : AppCompatActivity() {
     }
 
 
-
+    /**
+     * Encripta la contraseña ingresada en el EditText
+     * Envia los datos al servidor
+     * Muestra error en caso de no lograr hacer el envío al servidor
+     */
     fun iniciarSesion(v: View) {
         btnIniciar = v
         var usertext = usuario.text.toString()
@@ -119,13 +145,17 @@ class LogInActivity : AppCompatActivity() {
     }
 
 
-
+    /**
+     * Se encarga de abrir la actividad SignInActivity
+     */
     fun abrirSignIn(v: View){
         val intent = Intent(this, SignInActivity::class.java)
         startActivity(intent)
     }
 
-    //Función para escribir a un archivo
+    /**
+     * Función para escribir a un archivo
+     */
     fun writeToFile(str: String) {
         val dir = File(filesDir, "mydir")
 

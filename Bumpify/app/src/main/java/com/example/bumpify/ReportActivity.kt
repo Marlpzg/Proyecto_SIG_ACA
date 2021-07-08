@@ -1,3 +1,21 @@
+/*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+ */
 package com.example.bumpify
 
 import android.content.Intent
@@ -39,7 +57,7 @@ class ReportActivity : AppCompatActivity() {
     private lateinit var repository: Repository
     private lateinit var viewModelFactory: MainViewModelFactory
 
-
+    //Modelo donde se guardan las respuestas del servidor
     data class Req(@SerializedName("data") val mensaje: String, @SerializedName("codigo") val codigo: Int)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,29 +66,31 @@ class ReportActivity : AppCompatActivity() {
         val intent = getIntent()
         txtplaceholder = findViewById<TextView>(R.id.tv_placeholder)
         ivplaceholder = findViewById<ImageView>(R.id.iv_report_holder)
+
+        //Porción de código para obtener datos de un intent
         ID = intent.getIntExtra("id", 1).toString()
         latitude = intent.getDoubleExtra("latitude", 1.1).toString()
         longitude = intent.getDoubleExtra("longitude", 1.1).toString()
         reportname = intent.getStringExtra("name").toString()
         imageid = intent.getIntExtra("image", 1)
+
         var completetext = "Reportando un "+reportname
         txtplaceholder.text = completetext
         ivplaceholder.setImageResource(imageid)
-        Log.d("latitude", latitude.toString())
-        Log.d("longitude", longitude.toString())
         txtDescripcion = findViewById<EditText>(R.id.txtDescripcion)
 
     }
 
     override fun onStart() {
         super.onStart()
-
-       repository  = Repository()
-       viewModelFactory = MainViewModelFactory(repository)
+        //Configuración para envir datos a la API
+        repository  = Repository()
+        viewModelFactory = MainViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
         viewModel.myRespuesta.observe(this, Observer { response ->
             val res: SignInActivity.Req = Gson().fromJson(response.body()?.res,SignInActivity.Req::class.java)
+            //Validación de la respuesta de la API
             if(res.codigo == 500){
                 val contexto = findViewById<View>(R.id.ReportContainer)
                 val snack = Snackbar.make(contexto,res.mensaje, Snackbar.LENGTH_INDEFINITE);
@@ -85,6 +105,9 @@ class ReportActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * Función para enviar Datos al servidor
+     * */
     fun enviarReporte(v: View){
         var gps : Location
 
@@ -100,8 +123,9 @@ class ReportActivity : AppCompatActivity() {
 
 
     }
-
-    //Función para leer de un archivo
+    /**
+     * Función para leer de un archivo
+     * */
     fun readFromFile(): String {
         try {
             val dir = File(filesDir, "mydir/sesion.txt")

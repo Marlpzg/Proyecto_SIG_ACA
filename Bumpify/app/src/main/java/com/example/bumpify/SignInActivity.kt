@@ -1,3 +1,21 @@
+/*
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+ */
 package com.example.bumpify
 
 import android.content.Intent
@@ -46,11 +64,15 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
     private lateinit var repository: Repository
     private lateinit var viewModelFactory: MainViewModelFactory
+
+    //Modelo donde se guardan las respuestas del servidor
     data class Req(@SerializedName("data") val mensaje: String, @SerializedName("codigo") val codigo: Int)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
 
+        //Inicialización de los inputs de la activity
         txtnombre = findViewById<EditText>(R.id.txtNombre)
         txtapellido = findViewById<EditText>(R.id.txtApellido)
         txtcorreo = findViewById<EditText>(R.id.txtCorreo)
@@ -61,6 +83,11 @@ class SignInActivity : AppCompatActivity() {
         radioGroup = findViewById<RadioGroup>(R.id.RadioGroupSignIn)
     }
 
+    /**
+     * Encripta la contraseña ingresada en el EditText
+     * Envia los datos al servidor
+     * Muestra error en caso de no lograr hacer el envío al servidor
+     */
     fun enviarDatos(v: View){
         var nombre = txtnombre.text.toString()
         var apellido = txtapellido.text.toString()
@@ -81,6 +108,7 @@ class SignInActivity : AppCompatActivity() {
             genero = "F"
         }
 
+        //Validación de inputs
         if(!validartamanoinput(1, nombre, 20)){
             txtnombre.setError("El nombre debe estar comprendido entre 1 y 20 caracteres")
             nombreFlag = false
@@ -89,7 +117,7 @@ class SignInActivity : AppCompatActivity() {
             nombreFlag = true
         }
 
-
+        //Validación de inputs
         if (!validartamanoinput(1, apellido, 20)){
             txtapellido.setError("El Apellido debe estar comprendido entre 1 y 20 caracteres")
             apellidoFlag = false
@@ -97,7 +125,7 @@ class SignInActivity : AppCompatActivity() {
             txtapellido.error = null
             apellidoFlag = true
         }
-
+        //Validación de inputs
         if (!validartamanoinput(1, correo, 300)) {
             txtcorreo.setError("El correo debe estar comprendido entre 1 y 300 caracteres")
             correoFlag = false
@@ -108,7 +136,7 @@ class SignInActivity : AppCompatActivity() {
             txtcorreo.error = null
             correoFlag = true
         }
-
+        //Validación de inputs
         if (!validartamanoinput(5, usuario, 30)){
             txtusuario.setError("El usuario debe estar comprendido entre 5 y 30 caracteres")
             usuarioFlag = false
@@ -117,7 +145,7 @@ class SignInActivity : AppCompatActivity() {
             txtusuario.error = null
             usuarioFlag = true
         }
-
+        //Validación de inputs
         if (!validartamanoinput(8, contra, 50)){
             txtcontra.setError("La contraseña debe estar comprendido entre 8 y 50 caracteres")
             contraFlag = false
@@ -125,7 +153,7 @@ class SignInActivity : AppCompatActivity() {
             txtcontra.error = null
             contraFlag = true
         }
-
+        //Validación de inputs
         if (!rbngeneroF.isChecked && !rbngeneroM.isChecked){
             rbngeneroF.setError("Seleccione un genero")
             generoFlag = false
@@ -134,7 +162,7 @@ class SignInActivity : AppCompatActivity() {
             generoFlag = true
         }
 
-
+        //Si todos los inputs estan correctos, se intenta hacer un envio de datos al servidor
         if(nombreFlag && apellidoFlag && correoFlag && usuarioFlag && contraFlag && generoFlag) {
             val myPost = User(nombre, apellido, correo, usuario, AESCrypt.encrypt(contra, "hello world"), genero)
             viewModel.pushUser(myPost)
@@ -145,6 +173,8 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        //Configuración para envir datos a la API
         repository  = Repository()
         viewModelFactory = MainViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
@@ -152,6 +182,8 @@ class SignInActivity : AppCompatActivity() {
         viewModel.myRespuesta.observe(this, Observer { response ->
 
             val res: SignInActivity.Req = Gson().fromJson(response.body()?.res,SignInActivity.Req::class.java)
+
+            //Validación de la respuesta de la API
             if(res.codigo == 500){
                 val contexto = findViewById<View>(R.id.signincontainer)
                 val snack = Snackbar.make(contexto,res.mensaje, Snackbar.LENGTH_INDEFINITE);
@@ -167,7 +199,12 @@ class SignInActivity : AppCompatActivity() {
         })
 
     }
-
+    /**
+     * Retorna un booleano para verificar si esta validado o no el input
+     * Se utiliza para validar la longitud del input segun los parametros ingresados
+     * @param tamaniominimo int longitud minimo de la cadena
+     * @param tamaniomaximo int longitud máximo de la cadena
+     * @param cadena String cadena a validar*/
     fun validartamanoinput(tamaniominimo: Int, cadena: String, tamaniomaximo: Int):Boolean{
         if(cadena.trim().length < tamaniominimo){
             return false;
@@ -176,7 +213,9 @@ class SignInActivity : AppCompatActivity() {
         }
         return true
     }
-
+    /**
+     * Función para abrir la actividad LogInActivity
+     * */
     fun abrirLogIn(v: View){
         val intent = Intent(this, LogInActivity::class.java)
         startActivity(intent)
