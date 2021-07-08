@@ -4,7 +4,7 @@
   "private": true,
   "nodemonConfig": { "ext": "js", "ignore": ["*.test.ts", "db/*"], "delay": "2" },
   "scripts": {
-    "start": "set PORT=3006 && nodemon app.js"
+    "start": "nodemon bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
