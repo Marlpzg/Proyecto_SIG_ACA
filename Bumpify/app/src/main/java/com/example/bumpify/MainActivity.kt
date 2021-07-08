@@ -73,11 +73,13 @@ class MainActivity : AppCompatActivity() {
     data class Req(@SerializedName("data") val data: Array<Point>,@SerializedName("dangerLevel") val danger: Double)
     data class Point(@SerializedName("coords") val coor: Array<Double>,@SerializedName("type") val type: Int,@SerializedName("desc") val desc: String,@SerializedName("date") val date: Date,@SerializedName("votesNum") val votes: Int)
 
+    //Crea el menu "3 dot options" para poder hacer log out en la aplicación
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
     }
 
+    //Funcion que se inicializa al seleccionar una opción del menú de 3 puntos.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id: Int = item.getItemId()
         if (id == R.id.logout_menu) {
@@ -147,6 +149,7 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
         ) {
+            //Crea una alerta de dialogo para poder informar por qué se necesita los permisos de ubicación
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Permisos de ubicación necesario")
                 .setMessage("Usaremos tu ubicación para poder ubicar correctamente los incidentes que reportes")
@@ -169,12 +172,13 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+    //Metodo para gestionar cuando recibimos el resultado del permiso
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         if (requestCode == FINE_LOCATION_PERMISSIONS_CODE) {
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show()
             } else {
-                //Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show()
             }
         }
     }
