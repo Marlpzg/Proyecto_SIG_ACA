@@ -2,8 +2,9 @@
   "name": "bumpifyapi",
   "version": "0.0.0",
   "private": true,
+  "nodemonConfig": { "ext": "js", "ignore": ["*.test.ts", "db/*"], "delay": "2" },
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "set PORT=3006 && nodemon app.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
